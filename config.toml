@@ -23,7 +23,7 @@ highlight_theme = "ayu-mirage"
 # Put all your custom variables here
 default_colorset = "light"
 logo_text = "JADE LOG"
-logo_image_path = "images/tomato.png"
+logo_image_path = "public/images/tomato.png"
 
 
 nav = [
