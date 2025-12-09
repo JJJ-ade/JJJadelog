@@ -1,0 +1,17 @@
+name: Zola Deploy to GitHub Pages
+on: push
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and deploy
+        uses: shalzz/zola-deploy-action@master
+        env:
+          PAGES_BRANCH: gh-pages        # 배포 대상 브랜치
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 제공 토큰 사용 (동일 리포지토리 배포)
+        # 만약 별도 Personal Access Token을 사용할 경우 위 줄 대신:
+        # TOKEN: ${{ secrets.TOKEN }}
