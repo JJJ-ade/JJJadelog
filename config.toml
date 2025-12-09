@@ -27,13 +27,13 @@ logo_image_path = "images/tomato.png"
 
 
 nav = [
-  { name = "Blog", url = "/blog", type = "url", icon = "fa-solid fa-book" },
-  { name = "Github", url = "https://github.com/JJJ-ade\" target=\"_blank\" rel=\"noopener noreferrer", type = "url", icon = "fa-brands fa-github"},
-
-  { name = "Categories", type = "dropdown", icon = "fa-solid fa-folder", members = [
+  { name = "Link", type = "dropdown", icon = "fa-solid fa-paperclip", members = [
+    { name = "Github", url = "https://github.com/JJJ-ade\" target=\"_blank\" rel=\"noopener noreferrer", type = "url", icon = "fa-brands fa-github" }
+  ] },
+  { name = "Categories", type = "dropdown", icon = "fa-solid fa-star", members = [
       { name = "Diary", url = "/blog/diary", icon = "fa-solid fa-pen-nib" },
       { name = "Life",  url = "/blog/life",  icon = "fa-solid fa-heart" }
   ] }
 ]
 
-default_thumbnail = "static/images/tomato.png"
+default_thumbnail = "images/tomato.png"

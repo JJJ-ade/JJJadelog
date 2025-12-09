@@ -1,7 +1,6 @@
 +++
-title = "Diary"
+title = "01. 일상"
 sort_by = "date"
 template = "section.html"
+weight = 1
 +++
-
-일기 모음입니다 📝
