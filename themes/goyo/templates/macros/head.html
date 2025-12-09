@@ -1,0 +1,258 @@
+{% macro get_theme_color(config) %}
+{%- set colorset = config.extra.default_colorset | default(value='dark') -%}
+{%- set brightness = config.extra.brightness | default(value='normal') -%}
+{%- if colorset == "dark" and brightness == "darker" -%}
+#000000
+{%- elif colorset == "dark" -%}
+#0f172a
+{%- elif colorset == "light" -%}
+#ffffff
+{%- else -%}
+#0f172a
+{%- endif -%}
+{% endmacro get_theme_color %}
+
+{% macro html_tag(config, lang) %}
+{%- set theme_color = self::get_theme_color(config=config) | trim -%}
+<html lang="{{ lang | default(value='en') }}" style="background-color: {{ theme_color }};">
+{% endmacro html_tag %}
+
+{% macro head(config, page, section, current_url) %}
+    {# current_url이 정의되어 있지 않으면 기본값으로 설정 #}
+    {% if current_url is not defined or current_url == "" %}
+        {% set current_url = config.base_url %}
+    {% endif %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Resource Hints for better performance -->
+    {% if config.extra.gtag and config.extra.gtag != "" %}
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    {% endif %}
+
+    <!-- Initialize theme and brightness before CSS loads to prevent FOUC -->
+    <script>
+        (function() {
+            // Theme mapping - maps user-friendly names to actual DaisyUI theme names
+            var themeMapping = { "goyo-dark": "night", "goyo-light": "lofi" };
+            
+            // Get default values from config
+            var defaultColorset = "{{ config.extra.default_colorset | default(value='dark') }}";
+            var defaultBrightness = "{{ config.extra.brightness | default(value='normal') }}";
+            var themeMap = { "dark": "goyo-dark", "light": "goyo-light" };
+            var fallbackTheme = themeMap[defaultColorset] || "goyo-dark";
+            
+            // Get theme from localStorage or use fallback
+            var currentUserTheme = localStorage.getItem('theme') || fallbackTheme;
+            var actualTheme = themeMapping[currentUserTheme] || currentUserTheme;
+            
+            // Set theme and brightness attributes immediately
+            document.documentElement.setAttribute("data-theme", actualTheme);
+            document.documentElement.setAttribute("data-brightness", defaultBrightness);
+        })();
+    </script>
+
+    <style>
+        {% if config.extra.custom_font_enabled and config.extra.custom_font_path %}
+            {# Custom font configuration #}
+            {% set font_path = config.extra.custom_font_path %}
+            {% if font_path is starting_with("http://") or font_path is starting_with("https://") %}
+                {# Remote font URL - use @import #}
+                @import url('{{ font_path | safe }}');
+            {% else %}
+                {# Local font file - use @font-face #}
+                @font-face {
+                    font-family: "{{ config.extra.custom_font_name | default(value='CustomFont') }}";
+                    src: url('{{ get_url(path=font_path) | safe }}') format("woff");
+                    font-weight: 400;
+                    font-style: normal;
+                    font-display: swap;
+                }
+            {% endif %}
+            body {
+                font-family: "{{ config.extra.custom_font_name | default(value='CustomFont') }}", sans-serif;
+            }
+        {% else %}
+            {# Default Pretendard font with font-display swap for better performance #}
+            @font-face {
+                font-family: "Pretendard-Regular";
+                src: url('{{ get_url(path="fonts/Pretendard-Regular.woff") | safe }}') format("woff");
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+            }
+            body {
+                font-family: "Pretendard-Regular", sans-serif;
+            }
+        {% endif %}
+    </style>
+
+    {% if page %}
+        {% if page.description %}
+            <meta name="description" content="{{ page.description }}" />
+        {% elif config.description %}
+            <meta name="description" content="{{ config.description }}" />
+        {% endif %}
+    {% elif config.description %}
+        <meta name="description" content="{{ config.description }}" />
+    {% endif %}
+
+    <title>
+      {%- if page and page.title -%}
+        {{ page.title }} | {{ config.title | default(value="Goyo") }}
+      {%- elif section and section.title -%}
+        {{ section.title }} | {{ config.title | default(value="Goyo") }}
+      {%- elif config.title -%}
+        {{ config.title }}
+      {%- else -%}
+        Goyo
+      {%- endif -%}
+    </title>
+
+    {# Google Analytics gtag.js integration #}
+    {% if config.extra.gtag and config.extra.gtag != "" %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.extra.gtag }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ config.extra.gtag }}');
+    </script>
+    {% endif %}
+
+      <!-- SEO: Open Graph / Twitter Card -->
+      <meta property="og:title" content="
+        {%- if page and page.title -%}
+          {{ page.title }} | {{ config.title | default(value='Goyo') }}
+        {%- elif section and section.title -%}
+          {{ section.title }} | {{ config.title | default(value='Goyo') }}
+        {%- elif config.title -%}
+          {{ config.title }}
+        {%- else -%}
+          Goyo
+        {%- endif -%}
+      " />
+      <meta property="og:description" content="
+        {%- if page and page.description -%}
+          {{ page.description }}
+        {%- elif section and section.description -%}
+          {{ section.description }}
+        {%- elif config.description -%}
+          {{ config.description }}
+        {%- endif -%}
+      " />
+      <meta property="og:url" content="{{ current_url | safe }}" />
+      <meta property="og:type" content="website" />
+      {% if page.extra.thumbnail %}
+      <meta property="og:image" content="{{ get_url(path=page.extra.thumbnail) | safe }}" />
+      {% elif config.extra.default_thumbnail %}
+      <meta property="og:image" content="{{ get_url(path=config.extra.default_thumbnail) | safe }}" />
+      {% endif %}
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="{% if page %}{{ page.title }}{% else %}{{ config.title }}{% endif %}" />
+      <meta name="twitter:description" content="
+        {%- if page and page.description -%}
+          {{ page.description }}
+        {%- elif section and section.description -%}
+          {{ section.description }}
+        {%- elif config.description -%}
+          {{ config.description }}
+        {%- endif -%}
+      " />
+      {% if config.extra.twitter_site %}
+      <meta name="twitter:site" content="{{ config.extra.twitter_site }}" />
+      {% endif %}
+      {% if config.extra.twitter_creator %}
+      <meta name="twitter:creator" content="{{ config.extra.twitter_creator }}" />
+      {% endif %}
+      {% if page.extra.thumbnail %}
+      <meta name="twitter:image" content="{{ get_url(path=page.extra.thumbnail) | safe }}" />
+      {% elif config.extra.default_thumbnail %}
+      <meta name="twitter:image" content="{{ get_url(path=config.extra.default_thumbnail) | safe }}" />
+      {% endif %}
+
+      <!-- Browser address bar color -->
+      <meta name="theme-color" content="{{ self::get_theme_color(config=config) | trim }}">
+
+      <!-- CSS -->
+    <link rel="stylesheet" href="{{ get_url(path="css/main.css") | safe }}">
+    <link rel="stylesheet" href="{{ get_url(path="css/font-awesome.min.css") | safe }}">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="{{ get_url(path="fonts/Pretendard-Regular.woff") | safe }}" as="font" type="font/woff" crossorigin>
+
+    <!-- Defer non-critical scripts -->
+    <script defer src="{{ get_url(path="js/copy_code.js") | safe }}"></script>
+    <script defer src="{{ get_url(path="js/copy_heading_link.js") | safe }}"></script>
+    
+    <!-- Lazy load Mermaid and KaTeX - only when needed -->
+    <script>
+        // Lazy load KaTeX and Mermaid when needed
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check for both KaTeX inline and block elements in one pass
+            var katexInlineElements = document.querySelectorAll('.katex-inline');
+            var katexBlockElements = document.querySelectorAll('.katex-block');
+            var hasKatex = katexInlineElements.length > 0 || katexBlockElements.length > 0;
+            var hasMermaid = document.querySelector('.mermaid');
+            
+            // Load KaTeX if math elements are present
+            if (hasKatex) {
+                // Load KaTeX CSS first
+                var katexCSS = document.createElement('link');
+                katexCSS.rel = 'stylesheet';
+                katexCSS.href = '{{ get_url(path="css/katex.min.css") | safe }}';
+                document.head.appendChild(katexCSS);
+                
+                // Load KaTeX JS
+                var katexScript = document.createElement('script');
+                katexScript.src = '{{ get_url(path="js/katex.min.js") | safe }}';
+                katexScript.onload = function() {
+                    // Render inline elements
+                    katexInlineElements.forEach(function(elem) {
+                        var texContent = elem.textContent || elem.innerText;
+                        try {
+                            katex.render(texContent, elem, { 
+                                throwOnError: false,
+                                displayMode: false
+                            });
+                        } catch(e) {
+                            console.error('KaTeX render error:', e);
+                        }
+                    });
+                    
+                    // Render block elements
+                    katexBlockElements.forEach(function(elem) {
+                        var texContent = elem.textContent || elem.innerText;
+                        try {
+                            katex.render(texContent, elem, { 
+                                throwOnError: false,
+                                displayMode: true
+                            });
+                        } catch(e) {
+                            console.error('KaTeX render error:', e);
+                        }
+                    });
+                };
+                document.head.appendChild(katexScript);
+            }
+            
+            // Load Mermaid if diagram elements are present
+            if (hasMermaid) {
+                var mermaidScript = document.createElement('script');
+                mermaidScript.src = '{{ get_url(path="js/mermaid.min.js") | safe }}';
+                mermaidScript.onload = function() {
+                    // Initialize Mermaid after loading
+                    if (typeof window.initMermaid === 'function') {
+                        window.initMermaid();
+                    }
+                };
+                document.head.appendChild(mermaidScript);
+            }
+        });
+    </script>
+{% endmacro head %}
