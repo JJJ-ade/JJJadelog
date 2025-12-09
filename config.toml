@@ -2,10 +2,6 @@ base_url = "https://JJJ-ade.github.io/JJJadelog/"
 title = "JJJade"
 theme = "goyo"
 
-landing = [
-    { title = "Hello World", link = "hello-world", desc = "첫 포스트입니다." },
-]
-
 compile_sass = false
 build_search_index = false
 
@@ -25,4 +21,8 @@ footer_html = "Powered by <a href='https://www.getzola.org'>Zola</a> and <a href
 nav = [
   { name = "Docs", url = "/introduction", type = "url", icon = "fa-solid fa-book" },
   { name = "GitHub", url = "https://github.com/JJJ-ade/JJJadelog", type = "url", icon = "fa-brands fa-github" },
+]
+
+landing = [
+    { title = "Hello World", link = "hello-world", desc = "첫 포스트입니다." },
 ]
