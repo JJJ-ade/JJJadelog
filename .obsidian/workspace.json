@@ -185,6 +185,8 @@
   },
   "active": "9ed345a227f00795",
   "lastOpenFiles": [
+    "workflows/deploy.yml",
+    "workflows",
     "public/resources/zola.svg",
     "public/resources/tailwindcss.svg",
     "public/resources/lina.jpg",
@@ -199,12 +201,10 @@
     "public/images/side-home.jpg",
     "public/images/light.jpg",
     "public/images/landing.jpg",
-    "public/images/goyo.png",
     "public/fonts/fa-v4compatibility.woff2",
     "public/fonts/fa-solid-900.woff2",
     "public/fonts/fa-regular-400.woff2",
     "public/fonts/fa-brands-400.woff2",
-    "public/fonts/Pretendard-Regular.woff",
-    "public/fonts/KaTeX_Typewriter-Regular.woff2"
+    "public/fonts/Pretendard-Regular.woff"
   ]
 }
