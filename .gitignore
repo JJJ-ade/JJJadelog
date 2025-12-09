@@ -2,3 +2,4 @@ public/
 .DS_Store
 themes/.DS_Store
 _site/
+.obsidian
