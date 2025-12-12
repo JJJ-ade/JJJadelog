@@ -24,7 +24,7 @@ highlight_theme = "ayu-mirage"
 default_colorset = "light"
 logo_text = "JADE LOG"
 logo_image_path = "images/tomato.png"
-
+disable_theme_toggle = true
 
 nav = [
   { name = "Categories", type = "dropdown", icon = "fa-solid fa-star", members = [
